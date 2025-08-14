@@ -5,93 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Players Stats</title>
     <style>
-        :root{
-            --primary:#00a2ff;
-            --border-radius:8px;
-            --box-shadow:0 4px 6px rgba(0,0,0,.1);
-            --transition:.3s;
+        :root {
+            --primary: #00a2ff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: 0.3s;
+            --premium: #af00ff;
         }
-        /*  Light (default)  */
-        :root[data-theme="light"]{
-            --bg:#f5f5f5;
-            --card:#fff;
-            --text:#333;
-            --muted:#6c757d;
-            --success:#28a745;
-            --danger:#dc3545;
-            --border:#ddd;
+        :root[data-theme="light"] {
+            --bg: #f5f5f5;
+            --card: #fff;
+            --text: #333;
+            --muted: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --border: #ddd;
         }
-        /*  Dark  */
-        :root[data-theme="dark"]{
-            --bg:#121212;
-            --card:#1e1e1e;
-            --text:#e5e5e5;
-            --muted:#aaa;
-            --success:#34ce57;
-            --danger:#ff5252;
-            --border:#333;
+        :root[data-theme="dark"] {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e5e5e5;
+            --muted: #aaa;
+            --success: #34ce57;
+            --danger: #ff5252;
+            --border: #333;
         }
-
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
-        body{background:var(--bg);color:var(--text);line-height:1.6;padding:20px;transition:background var(--transition),color var(--transition);}
-        .container{max-width:800px;margin:0 auto;padding:20px;}
-        header{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;}
-        header h1{color:var(--primary);font-size:2.5rem;}
-        #themeToggle{background:none;border:none;font-size:1.5rem;cursor:pointer;transition:transform var(--transition);}
-        #themeToggle:hover{transform:scale(1.15);}
-        .search-box{background:var(--card);border:1px solid var(--border);border-radius:var(--border-radius);padding:30px;box-shadow:var(--box-shadow);margin-bottom:30px;}
-        .input-group{display:flex;margin-bottom:15px;}
-        input{flex:1;padding:12px 15px;border:1px solid var(--border);border-radius:var(--border-radius) 0 0 var(--border-radius);background:var(--bg);color:var(--text);outline:none;}
-        input:focus{border-color:var(--primary);}
-        button{background:var(--primary);color:#fff;border:none;padding:12px 20px;border-radius:0 var(--border-radius) var(--border-radius) 0;cursor:pointer;font-size:1rem;font-weight:600;}
-        button:hover{background:#0088cc;}
-        .player-card{background:var(--card);border:1px solid var(--border);border-radius:var(--border-radius);padding:25px;display:none;box-shadow:var(--box-shadow);}
-        .player-header{display:flex;align-items:center;margin-bottom:20px;}
-        .player-avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;margin-right:20px;border:3px solid var(--primary);cursor:pointer;}
-        .player-info h2{font-size:1.8rem;margin-bottom:5px;}
-        .player-info .username{color:var(--muted);font-size:1.2rem;margin-bottom:10px;}
-        .badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:.8rem;font-weight:bold;margin-right:5px;}
-        .verified{background:var(--success);color:#fff;}
-        .banned{background:var(--danger);color:#fff;}
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px;margin-top:20px;}
-        .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;text-align:center;cursor:pointer;transition:transform .2s;}
-        .stat-card:hover{transform:translateY(-3px);}
-        .stat-card h3{font-size:.9rem;color:var(--muted);margin-bottom:5px;}
-        .stat-card p{font-size:1.2rem;font-weight:bold;}
-        .loading{display:none;text-align:center;padding:20px;}
-        .spinner{border:4px solid rgba(0,0,0,.1);border-radius:50%;border-top:4px solid var(--primary);width:30px;height:30px;animation:spin 1s linear infinite;margin:0 auto 10px;}
-        @keyframes spin{to{transform:rotate(360deg);}}
-        .error{color:var(--danger);text-align:center;padding:15px;background:var(--danger);border-radius:var(--border-radius);margin-top:20px;display:none;}
-        footer{text-align:center;margin-top:40px;color:var(--muted);font-size:.9rem;}
-
-        /* Modals */
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;overflow-y:auto;}
-        .modal-content{background:var(--card);margin:5% auto;padding:20px;border-radius:var(--border-radius);box-shadow:var(--box-shadow);width:90%;max-width:600px;max-height:80vh;overflow-y:auto;}
-        .close{color:var(--muted);float:right;font-size:28px;font-weight:bold;cursor:pointer;}
-        .close:hover{color:var(--text);}
-        .modal-title{margin-bottom:20px;color:var(--primary);}
-        .badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:15px;margin-top:20px;}
-        .badge-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;text-align:center;}
-        .badge-icon{width:50px;height:50px;margin:0 auto 10px;display:block;}
-        .friends-list{margin-top:20px;}
-        .friend-item{display:flex;align-items:center;padding:10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background-color .2s;}
-        .friend-item:hover{background:var(--card);}
-        .friend-avatar{width:40px;height:40px;border-radius:50%;margin-right:10px;}
-        .friend-info{flex:1;}
-        .friend-name{font-weight:bold;}
-        .friend-username,.friend-id{color:var(--muted);font-size:.8rem;}
-        .action-buttons{display:flex;justify-content:flex-end;margin-top:20px;gap:10px;}
-        .action-btn{padding:8px 15px;border-radius:var(--border-radius);border:none;cursor:pointer;font-weight:600;}
-        .view-profile-btn{background:var(--primary);color:#fff;}
-        .view-profile-btn:hover{background:#0088cc;}
-        .close-btn{background:var(--muted);color:#fff;}
-        .close-btn:hover{background:#5a6268;}
-
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+        body{background:var(--bg);color:var(--text);line-height:1.6;padding:20px;transition:background var(--transition),color var(--transition)}
+        .container{max-width:800px;margin:0 auto;padding:20px}
+        header{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px}
+        header h1{color:var(--primary);font-size:2.5rem}
+        #themeToggle{background:none;border:none;font-size:1.5rem;cursor:pointer;transition:transform var(--transition)}
+        #themeToggle:hover{transform:scale(1.15)}
+        .search-box{background:var(--card);border:1px solid var(--border);border-radius:var(--border-radius);padding:30px;box-shadow:var(--box-shadow);margin-bottom:30px}
+        .input-group{display:flex;margin-bottom:15px}
+        input{flex:1;padding:12px 15px;border:1px solid var(--border);border-radius:var(--border-radius) 0 0 var(--border-radius);background:var(--bg);color:var(--text);outline:none}
+        input:focus{border-color:var(--primary)}
+        button{background:var(--primary);color:#fff;border:none;padding:12px 20px;border-radius:0 var(--border-radius) var(--border-radius) 0;cursor:pointer;font-size:1rem;font-weight:600}
+        button:hover{background:#0088cc}
+        .player-card{background:var(--card);border:1px solid var(--border);border-radius:var(--border-radius);padding:25px;display:none;box-shadow:var(--box-shadow)}
+        .player-header{display:flex;align-items:center;margin-bottom:20px}
+        .player-avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;margin-right:20px;border:3px solid var(--primary);cursor:pointer}
+        .player-info h2{font-size:1.8rem;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+        .player-info .username{color:var(--muted);font-size:1.2rem;margin-bottom:10px}
+        .badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:.8rem;font-weight:bold;margin-right:5px}
+        .verified{background:var(--success);color:#fff}
+        .banned{background:var(--danger);color:#fff}
+        .premium{color:var(--premium);font-size:1.5rem}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px;margin-top:20px}
+        .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;text-align:center;cursor:pointer;transition:transform .2s}
+        .stat-card:hover{transform:translateY(-3px)}
+        .stat-card h3{font-size:.9rem;color:var(--muted);margin-bottom:5px}
+        .stat-card p{font-size:1.2rem;font-weight:bold}
+        .loading{display:none;text-align:center;padding:20px}
+        .spinner{border:4px solid rgba(0,0,0,.1);border-radius:50%;border-top:4px solid var(--primary);width:30px;height:30px;animation:spin 1s linear infinite;margin:0 auto 10px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .error{color:var(--danger);text-align:center;padding:15px;background:var(--danger);border-radius:var(--border-radius);margin-top:20px;display:none}
+        footer{text-align:center;margin-top:40px;color:var(--muted);font-size:.9rem}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;overflow-y:auto}
+        .modal-content{background:var(--card);margin:5% auto;padding:20px;border-radius:var(--border-radius);box-shadow:var(--box-shadow);width:90%;max-width:600px;max-height:80vh;overflow-y:auto}
+        .close{color:var(--muted);float:right;font-size:28px;font-weight:bold;cursor:pointer}
+        .close:hover{color:var(--text)}
+        .modal-title{margin-bottom:20px;color:var(--primary)}
+        .badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:15px;margin-top:20px}
+        .badge-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;text-align:center}
+        .badge-icon{width:50px;height:50px;margin:0 auto 10px;display:block}
+        .friends-list{margin-top:20px}
+        .friend-item{display:flex;align-items:center;padding:10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background-color .2s}
+        .friend-item:hover{background:var(--card)}
+        .friend-avatar{width:40px;height:40px;border-radius:50%;margin-right:10px}
+        .friend-info{flex:1}
+        .friend-name{font-weight:bold}
+        .friend-username,.friend-id{color:var(--muted);font-size:.8rem}
+        .action-buttons{display:flex;justify-content:flex-end;margin-top:20px;gap:10px}
+        .action-btn{padding:8px 15px;border-radius:var(--border-radius);border:none;cursor:pointer;font-weight:600}
+        .view-profile-btn{background:var(--primary);color:#fff}
+        .view-profile-btn:hover{background:#0088cc}
+        .close-btn{background:var(--muted);color:#fff}
+        .close-btn:hover{background:#5a6268}
+        .places-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;margin-top:20px}
+        .place-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);overflow:hidden}
+        .place-thumbnail{width:100%;height:120px;object-fit:cover}
+        .place-info{padding:15px}
+        .place-name{font-weight:bold;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .place-stats{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-bottom:10px}
+        .place-players{color:var(--muted);font-size:.8rem}
+        .place-votes{display:flex;align-items:center;gap:5px}
+        .upvote{color:var(--success)}
+        .downvote{color:var(--danger)}
+        .place-play-btn{display:block;width:100%;padding:8px;background:var(--primary);color:#fff;text-align:center;border-radius:var(--border-radius);text-decoration:none;font-weight:600;transition:background .2s}
+        .place-play-btn:hover{background:#0088cc}
+        .rolibadge-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;text-align:center}
+        .rolibadge-icon{width:50px;height:50px;margin:0 auto 10px;display:block;filter:hue-rotate(180deg) brightness(1.2)}
+        .rolibadge-name{font-size:.9rem;margin-top:5px}
+        .rolibadges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:15px;margin-top:20px}
+        .rolimons-stats{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;margin-top:20px}
+        .rolimons-stats h3{color:var(--primary);margin-bottom:10px}
+        .rolimons-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .rolimons-stat{font-size:.9rem}
+        .rolimons-stat span:first-child{color:var(--muted)}
         @media(max-width:600px){
-            .player-header{flex-direction:column;text-align:center;}
-            .player-avatar{margin-right:0;margin-bottom:15px;}
-            .stats-grid{grid-template-columns:1fr 1fr;}
-            .modal-content{width:95%;margin:10px auto;}
+            .player-header{flex-direction:column;text-align:center}
+            .player-avatar{margin-right:0;margin-bottom:15px}
+            .stats-grid{grid-template-columns:1fr 1fr}
+            .modal-content{width:95%;margin:10px auto}
+            .places-grid{grid-template-columns:1fr}
+            .rolibadges-grid{grid-template-columns:1fr 1fr}
+            .rolimons-stats-grid{grid-template-columns:1fr}
         }
     </style>
 </head>
@@ -135,11 +155,23 @@
                 <div class="stat-card" id="followersCountCard"><h3>Followers</h3><p id="followersCount"></p></div>
                 <div class="stat-card" id="followingCountCard"><h3>Following</h3><p id="followingCount"></p></div>
                 <div class="stat-card" id="groupRolesCard"><h3>Group Roles</h3><p id="groupRolesCount"></p></div>
+                <div class="stat-card" id="placesCountCard"><h3>Places</h3><p id="placesCount"></p></div>
+            </div>
+
+            <div class="rolimons-stats" id="rolimonsStats" style="display:none;">
+                <h3>Rolimons Stats</h3>
+                <div class="rolimons-stats-grid" id="rolimonsStatsGrid"></div>
+            </div>
+
+            <div class="rolimons-stats" id="rolibadgesSection" style="display:none;">
+                <h3>Rolibadges</h3>
+                <div class="rolibadges-grid" id="rolibadgesGrid"></div>
             </div>
 
             <div class="action-buttons">
                 <button id="viewProfileBtn" class="action-btn view-profile-btn">View on Roblox</button>
                 <button id="showBadgesBtn" class="action-btn">Show Badges</button>
+                <button id="showPlacesBtn" class="action-btn">Show Places</button>
             </div>
         </div>
 
@@ -148,24 +180,59 @@
         </footer>
     </div>
 
-    <!-- Modals -->
-    <div id="badgesModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2 class="modal-title">Player Badges</h2><div id="badgesContent" class="badges-grid"></div></div></div>
-    <div id="friendsModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2 class="modal-title">Friends List</h2><div id="friendsContent" class="friends-list"></div></div></div>
-    <div id="followersModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2 class="modal-title">Followers List</h2><div id="followersContent" class="friends-list"></div></div></div>
-    <div id="followingModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2 class="modal-title">Following List</h2><div id="followingContent" class="friends-list"></div></div></div>
-    <div id="groupsModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2 class="modal-title">Group Roles</h2><div id="groupsContent"></div></div></div>
+    <div id="badgesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">Player Badges</h2>
+            <div id="badgesContent" class="badges-grid"></div>
+        </div>
+    </div>
+    <div id="friendsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">Friends List</h2>
+            <div id="friendsContent" class="friends-list"></div>
+        </div>
+    </div>
+    <div id="followersModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">Followers List</h2>
+            <div id="followersContent" class="friends-list"></div>
+        </div>
+    </div>
+    <div id="followingModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">Following List</h2>
+            <div id="followingContent" class="friends-list"></div>
+        </div>
+    </div>
+    <div id="groupsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">Group Roles</h2>
+            <div id="groupsContent"></div>
+        </div>
+    </div>
+    <div id="placesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">Player's Places</h2>
+            <div id="placesContent" class="places-grid"></div>
+        </div>
+    </div>
 
     <script>
         /* ---------- Theme handling ---------- */
         const themeToggle = document.getElementById('themeToggle');
-        const html        = document.documentElement;
-        const saved       = localStorage.getItem('theme') || 'light';
+        const html = document.documentElement;
+        const saved = localStorage.getItem('theme') || 'light';
         html.setAttribute('data-theme', saved);
         themeToggle.textContent = saved === 'light' ? '🌙' : '☀️';
-
         themeToggle.addEventListener('click', () => {
             const current = html.getAttribute('data-theme');
-            const next    = current === 'light' ? 'dark' : 'light';
+            const next = current === 'light' ? 'dark' : 'light';
             html.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
             themeToggle.textContent = next === 'light' ? '🌙' : '☀️';
@@ -173,10 +240,9 @@
 
         /* ---------- URL sharing ---------- */
         const params = new URLSearchParams(location.search);
-        const input  = document.getElementById('playerId');
+        const input = document.getElementById('playerId');
         if (params.has('q')) input.value = params.get('q');
-
-        function updateUrl(value){
+        function updateUrl(value) {
             const url = new URL(location);
             url.searchParams.set('q', value);
             history.replaceState(null, '', url);
@@ -184,32 +250,58 @@
 
         /* ---------- Core logic ---------- */
         const proxyUrl = 'https://corsproxy.io/?';
-        const searchBtn  = document.getElementById('searchBtn');
-        const loading    = document.getElementById('loading');
-        const error      = document.getElementById('error');
+        const searchBtn = document.getElementById('searchBtn');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
         const playerCard = document.getElementById('playerCard');
 
-        async function resolveUsername(name){
-            if(/^\d+$/.test(name)) return name;
+        function getProxiedImageUrl(url) {
+            if (!url) return '';
+            return `https://images.weserv.nl/?url=${encodeURIComponent(url.replace('https://', ''))}`;
+        }
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        function formatBadgeName(name) {
+            return name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        async function resolveUsername(name) {
+            if (/^\d+$/.test(name)) return name;
             const url = `${proxyUrl}${encodeURIComponent('https://users.roblox.com/v1/usernames/users')}`;
             const res = await fetch(url, {
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({usernames:[name]})
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usernames: [name] })
             });
             const json = await res.json();
-            if(!json.data?.length) throw new Error('Username not found');
+            if (!json.data?.length) throw new Error('Username not found');
             return json.data[0].id;
         }
 
-        async function fetchPlayerData(){
-            const raw = input.value.trim();
-            if(!raw) return showError('Please enter a User ID or Username');
-            loading.style.display='block';
-            playerCard.style.display='none';
-            error.style.display='none';
+        /* ======  OPTION 1 – Rolimons with silent failure  ====== */
+        async function fetchRolimonsData(userId) {
+            try {
+                const url = `${proxyUrl}${encodeURIComponent(
+                    `https://api.rolimons.com/players/v1/playerinfo/${userId}`
+                )}`;
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data.success ? data : null;
+            } catch {
+                return null; // silently ignore any error
+            }
+        }
 
-            try{
+        async function fetchPlayerData() {
+            const raw = input.value.trim();
+            if (!raw) return showError('Please enter a User ID or Username');
+            loading.style.display = 'block';
+            playerCard.style.display = 'none';
+            error.style.display = 'none';
+
+            try {
                 const id = await resolveUsername(raw);
                 updateUrl(raw);
 
@@ -223,127 +315,315 @@
                     `${proxyUrl}${encodeURIComponent(`https://accountinformation.roblox.com/v1/users/${id}/roblox-badges`)}`,
                     `${proxyUrl}${encodeURIComponent(`https://friends.roblox.com/v1/users/${id}/friends`)}`,
                     `${proxyUrl}${encodeURIComponent(`https://friends.roblox.com/v1/users/${id}/followers`)}`,
-                    `${proxyUrl}${encodeURIComponent(`https://friends.roblox.com/v1/users/${id}/followings`)}`
+                    `${proxyUrl}${encodeURIComponent(`https://friends.roblox.com/v1/users/${id}/followings`)}`,
+                    `${proxyUrl}${encodeURIComponent(`https://www.roblox.com/users/profile/playergames-json?userId=${id}`)}`
                 ];
 
                 const [
-                    avatarRes,userRes,fcRes,focRes,ficRes,groupsRes,badgesRes,
-                    friendsListRes,followersListRes,followingListRes
-                ] = await Promise.all(urls.map(u=>fetch(u)));
+                    avatarRes, userRes, fcRes, focRes, ficRes, groupsRes, badgesRes,
+                    friendsListRes, followersListRes, followingListRes, placesRes
+                ] = await Promise.all(urls.map(u => fetch(u)));
 
                 const [
-                    avatarData,userData,fc,foc,fic,groupsData,badgesData,
-                    friendsList,followersList,followingList
+                    avatarData, userData, fc, foc, fic, groupsData, badgesData,
+                    friendsList, followersList, followingList, placesData
                 ] = await Promise.all([
-                    avatarRes.json(),userRes.json(),fcRes.json(),focRes.json(),ficRes.json(),
-                    groupsRes.json(),badgesRes.json(),friendsListRes.json(),followersListRes.json(),followingListRes.json()
+                    avatarRes.json(), userRes.json(), fcRes.json(), focRes.json(), ficRes.json(),
+                    groupsRes.json(), badgesRes.json(), friendsListRes.json(), followersListRes.json(),
+                    followingListRes.json(), placesRes.json()
                 ]);
 
-                if(userData.errors) throw new Error(userData.errors[0]?.message || 'User not found');
-                displayPlayerData(avatarData,userData,fc,foc,fic,groupsData,badgesData,friendsList,followersList,followingList);
-            }catch(err){
+                if (userData.errors) throw new Error(userData.errors[0]?.message || 'User not found');
+
+                const rolimonsData = await fetchRolimonsData(id);
+
+                displayPlayerData(
+                    avatarData, userData, fc, foc, fic, groupsData, badgesData,
+                    friendsList, followersList, followingList, placesData,
+                    rolimonsData
+                );
+            } catch (err) {
                 showError(err.message || 'Failed to fetch player data');
-            }finally{
-                loading.style.display='none';
+            } finally {
+                loading.style.display = 'none';
             }
         }
 
-        function displayPlayerData(a,u,fc,foc,fic,g,b,fl,fol,fil){
-            if(a.data?.[0]?.imageUrl) document.getElementById('playerAvatar').src = a.data[0].imageUrl;
-            document.getElementById('playerDisplayName').textContent = u.displayName || u.name;
-            document.getElementById('playerUsername').textContent    = `@${u.name}`;
-            document.getElementById('playerIdStat').textContent      = u.id;
-            document.getElementById('playerCreated').textContent     = new Date(u.created).toLocaleDateString();
+        function displayPlayerData(a, u, fc, foc, fic, g, b, fl, fol, fil, p, rolimons) {
+            if (a.data?.[0]?.imageUrl) {
+                document.getElementById('playerAvatar').src = getProxiedImageUrl(a.data[0].imageUrl);
+            }
+            const displayNameEl = document.getElementById('playerDisplayName');
+            displayNameEl.textContent = u.displayName || u.name;
+            if (rolimons?.premium) {
+                const premiumSpan = document.createElement('span');
+                premiumSpan.className = 'premium';
+                premiumSpan.textContent = '💎';
+                premiumSpan.title = 'Premium Member';
+                displayNameEl.appendChild(premiumSpan);
+            }
+            document.getElementById('playerUsername').textContent = `@${u.name}`;
+            document.getElementById('playerIdStat').textContent = u.id;
+            document.getElementById('playerCreated').textContent = new Date(u.created).toLocaleDateString();
 
-            const badgesBox = document.getElementById('badges'); badgesBox.innerHTML='';
-            if(u.isBanned){
-                const ban=document.createElement('span'); ban.className='badge banned'; ban.textContent='BANNED';
+            const badgesBox = document.getElementById('badges');
+            badgesBox.innerHTML = '';
+            if (u.isBanned) {
+                const ban = document.createElement('span');
+                ban.className = 'badge banned';
+                ban.textContent = 'BANNED';
                 badgesBox.appendChild(ban);
-                document.getElementById('playerStatus').textContent='Banned';
-                document.getElementById('playerStatus').style.color='var(--danger)';
-            }else{
-                document.getElementById('playerStatus').textContent='Active';
-                document.getElementById('playerStatus').style.color='var(--success)';
+                document.getElementById('playerStatus').textContent = 'Banned';
+                document.getElementById('playerStatus').style.color = 'var(--danger)';
+            } else {
+                document.getElementById('playerStatus').textContent = 'Active';
+                document.getElementById('playerStatus').style.color = 'var(--success)';
             }
-            if(u.hasVerifiedBadge){
-                const ver=document.createElement('span'); ver.className='badge verified'; ver.textContent='VERIFIED';
+            if (u.hasVerifiedBadge) {
+                const ver = document.createElement('span');
+                ver.className = 'badge verified';
+                ver.textContent = 'VERIFIED';
                 badgesBox.appendChild(ver);
-                document.getElementById('playerVerified').textContent='Yes';
-                document.getElementById('playerVerified').style.color='var(--success)';
-            }else{
-                document.getElementById('playerVerified').textContent='No';
-                document.getElementById('playerVerified').style.color='var(--muted)';
+                document.getElementById('playerVerified').textContent = 'Yes';
+                document.getElementById('playerVerified').style.color = 'var(--success)';
+            } else {
+                document.getElementById('playerVerified').textContent = 'No';
+                document.getElementById('playerVerified').style.color = 'var(--muted)';
             }
 
-            document.getElementById('friendsCount').textContent    = fc.count  || 0;
-            document.getElementById('followersCount').textContent  = foc.count || 0;
-            document.getElementById('followingCount').textContent  = fic.count || 0;
+            document.getElementById('friendsCount').textContent = fc.count || 0;
+            document.getElementById('followersCount').textContent = foc.count || 0;
+            document.getElementById('followingCount').textContent = fic.count || 0;
             document.getElementById('groupRolesCount').textContent = g.data?.length || 0;
+            document.getElementById('placesCount').textContent = p.Games?.length || 0;
 
-            playerCard.dataset.badges   = JSON.stringify(b);
-            playerCard.dataset.friends  = JSON.stringify(fl);
-            playerCard.dataset.followers= JSON.stringify(fol);
-            playerCard.dataset.following= JSON.stringify(fil);
-            playerCard.dataset.groups   = JSON.stringify(g);
-            playerCard.style.display='block';
+            playerCard.dataset.badges = JSON.stringify(b);
+            playerCard.dataset.friends = JSON.stringify(fl);
+            playerCard.dataset.followers = JSON.stringify(fol);
+            playerCard.dataset.following = JSON.stringify(fil);
+            playerCard.dataset.groups = JSON.stringify(g);
+            playerCard.dataset.places = JSON.stringify(p);
+            playerCard.style.display = 'block';
+
+            displayRolimonsData(rolimons);
         }
-        function showError(msg){ error.textContent=msg; error.style.display='block'; }
+
+        function displayRolimonsData(data) {
+            const statsSection = document.getElementById('rolimonsStats');
+            const badgesSection = document.getElementById('rolibadgesSection');
+            const statsGrid = document.getElementById('rolimonsStatsGrid');
+            const badgesGrid = document.getElementById('rolibadgesGrid');
+
+            statsGrid.innerHTML = '';
+            badgesGrid.innerHTML = '';
+
+            if (!data || !data.success) {
+                statsSection.style.display = 'none';
+                badgesSection.style.display = 'none';
+                return;
+            }
+            statsSection.style.display = 'block';
+            const statsToShow = [
+                { name: 'Rank', value: data.rank || 'N/A' },
+                { name: 'RAP', value: formatNumber(data.rap) || '0' },
+                { name: 'Value', value: formatNumber(data.value) || '0' },
+                { name: 'Last Online', value: data.last_online ? new Date(data.last_online * 1000).toLocaleString() : 'Unknown' },
+                { name: 'Last Location', value: data.last_location || 'Unknown' },
+                { name: 'Privacy', value: data.privacy_enabled ? 'Enabled' : 'Disabled' }
+            ];
+            statsToShow.forEach(stat => {
+                const statEl = document.createElement('div');
+                statEl.className = 'rolimons-stat';
+                statEl.innerHTML = `<span>${stat.name}:</span> <span>${stat.value}</span>`;
+                statsGrid.appendChild(statEl);
+            });
+
+            if (data.rolibadges) {
+                badgesSection.style.display = 'block';
+                const badgeNames = {
+                    value_1m: 'Value Over 1M',
+                    value_5m: 'Value Over 5M',
+                    own_1_stf: 'Owns STF Item',
+                    value_10m: 'Value Over 10M',
+                    value_20m: 'Value Over 20M',
+                    own_1_rare: 'Owns Rare Item',
+                    own_5_noob: 'Owns 5 Noob Items',
+                    value_100k: 'Value Over 100K',
+                    value_500k: 'Value Over 500K',
+                    own_15_noob: 'Owns 15 Noob Items',
+                    own_3_rares: 'Owns 3 Rare Items',
+                    own_10_items: 'Owns 10 Items',
+                    own_10_rares: 'Owns 10 Rare Items',
+                    own_100_items: 'Owns 100 Items',
+                    own_1_dominus: 'Owns Dominus',
+                    own_1000_items: 'Owns 1000 Items',
+                    own_1_kotn_item: 'Owns KotN Item',
+                    own_1_big_dominus: 'Owns Big Dominus',
+                    own_all_asset_types: 'Owns All Asset Types',
+                    own_epic_katana_set: 'Owns Epic Katana Set',
+                    own_10_pct_of_1_item: 'Owns 10% of 1 Item',
+                    own_1_immortal_sword: 'Owns Immortal Sword',
+                    own_25_pct_of_1_item: 'Owns 25% of 1 Item',
+                    own_50_pct_of_1_item: 'Owns 50% of 1 Item',
+                    own_1_valued_federation_item: 'Owns Valued Federation Item'
+                };
+                Object.entries(data.rolibadges).forEach(([key, timestamp]) => {
+                    if (timestamp) {
+                        const badgeEl = document.createElement('div');
+                        badgeEl.className = 'rolibadge-item';
+                        const badgeName = badgeNames[key] || formatBadgeName(key);
+                        const badgeIcon = `https://www.rolimons.com/images/badges/${key}.svg`;
+                        badgeEl.innerHTML = `
+                            <img class="rolibadge-icon" src="${badgeIcon}" alt="${badgeName}" title="${badgeName}">
+                            <div class="rolibadge-name">${badgeName}</div>
+                        `;
+                        badgesGrid.appendChild(badgeEl);
+                    }
+                });
+                if (badgesGrid.children.length === 0) {
+                    badgesGrid.innerHTML = '<p>No Rolibadges found.</p>';
+                }
+            } else {
+                badgesSection.style.display = 'none';
+            }
+        }
+
+        function showError(msg) {
+            error.textContent = msg;
+            error.style.display = 'block';
+        }
 
         /* ---------- Modal wiring ---------- */
-        document.getElementById('viewProfileBtn').addEventListener('click',()=>window.open(`https://www.roblox.com/users/${document.getElementById('playerIdStat').textContent}/profile`,'_blank'));
-        document.getElementById('showBadgesBtn').addEventListener('click',showBadgesModal);
-        document.getElementById('friendsCountCard').addEventListener('click',showFriendsModal);
-        document.getElementById('followersCountCard').addEventListener('click',showFollowersModal);
-        document.getElementById('followingCountCard').addEventListener('click',showFollowingModal);
-        document.getElementById('groupRolesCard').addEventListener('click',showGroupsModal);
+        document.getElementById('viewProfileBtn').addEventListener('click', () => {
+            window.open(`https://www.roblox.com/users/${document.getElementById('playerIdStat').textContent}/profile`, '_blank');
+        });
+        document.getElementById('showBadgesBtn').addEventListener('click', showBadgesModal);
+        document.getElementById('showPlacesBtn').addEventListener('click', showPlacesModal);
+        document.getElementById('friendsCountCard').addEventListener('click', showFriendsModal);
+        document.getElementById('followersCountCard').addEventListener('click', showFollowersModal);
+        document.getElementById('followingCountCard').addEventListener('click', showFollowingModal);
+        document.getElementById('groupRolesCard').addEventListener('click', showGroupsModal);
+        document.getElementById('placesCountCard').addEventListener('click', showPlacesModal);
 
-        [...document.querySelectorAll('.close')].forEach(btn=>btn.addEventListener('click',()=>document.querySelectorAll('.modal').forEach(m=>m.style.display='none')));
-        window.addEventListener('click',e=>document.querySelectorAll('.modal').forEach(m=>{if(e.target===m)m.style.display='none';}));
+        [...document.querySelectorAll('.close')].forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            });
+        });
+        window.addEventListener('click', e => {
+            document.querySelectorAll('.modal').forEach(m => {
+                if (e.target === m) m.style.display = 'none';
+            });
+        });
 
-        searchBtn.addEventListener('click',fetchPlayerData);
-        input.addEventListener('keypress',e=>{if(e.key==='Enter')fetchPlayerData();});
+        searchBtn.addEventListener('click', fetchPlayerData);
+        input.addEventListener('keypress', e => {
+            if (e.key === 'Enter') fetchPlayerData();
+        });
 
         /* ---------- Modal builders ---------- */
-        function showBadgesModal(){
-            const badges=JSON.parse(playerCard.dataset.badges||'[]');
-            const container=document.getElementById('badgesContent'); container.innerHTML='';
-            if(!badges.length) return container.innerHTML='<p>No badges found.</p>';
-            badges.forEach(b=>{
-                const div=document.createElement('div'); div.className='badge-item';
-                div.innerHTML=`<img class="badge-icon" src="${b.imageUrl}" alt="${b.name}"><h3>${b.name}</h3><p style="font-size:.8rem;color:var(--muted)">${b.description}</p>`;
+        function showBadgesModal() {
+            const badges = JSON.parse(playerCard.dataset.badges || '[]');
+            const container = document.getElementById('badgesContent');
+            container.innerHTML = '';
+            if (!badges.length) return container.innerHTML = '<p>No badges found.</p>';
+            badges.forEach(b => {
+                const div = document.createElement('div');
+                div.className = 'badge-item';
+                div.innerHTML = `<img class="badge-icon" src="${getProxiedImageUrl(b.imageUrl)}" alt="${b.name}"><h3>${b.name}</h3><p style="font-size:.8rem;color:var(--muted)">${b.description}</p>`;
                 container.appendChild(div);
             });
-            document.getElementById('badgesModal').style.display='block';
+            document.getElementById('badgesModal').style.display = 'block';
         }
-        function createFriendList(data,modal,listEl){
-            const list=JSON.parse(data||'{}'); const container=document.getElementById(listEl); container.innerHTML='';
-            if(!list.data?.length) return container.innerHTML='<p>No data.</p>';
-            list.data.forEach(u=>{
-                const div=document.createElement('div'); div.className='friend-item';
-                div.innerHTML=`<img class="friend-avatar" src="https://www.roblox.com/headshot-thumbnail/image?userId=${u.id}&width=150&height=150&format=png"><div class="friend-info"><div class="friend-name">${u.displayName||u.name}</div><div class="friend-username">@${u.name}</div><div class="friend-id">ID: ${u.id}</div></div>`;
-                div.onclick=()=>{input.value=u.id; fetchPlayerData(); modal.style.display='none';};
+
+        function showPlacesModal() {
+            const places = JSON.parse(playerCard.dataset.places || '{}');
+            const container = document.getElementById('placesContent');
+            container.innerHTML = '';
+            if (!places.Games?.length) return container.innerHTML = '<p>This player has no places.</p>';
+            places.Games.forEach(place => {
+                const div = document.createElement('div');
+                div.className = 'place-item';
+                div.innerHTML = `
+                    <img class="place-thumbnail" src="${getProxiedImageUrl(place.Thumbnail?.Url || `https://www.roblox.com/asset-thumbnail/image?assetId=${place.PlaceID}&width=300&height=300&format=png`)}">
+                    <div class="place-info">
+                        <div class="place-name" title="${place.Name}">${place.Name}</div>
+                        <div class="place-stats">
+                            <span class="place-players">${formatNumber(place.Plays || 0)} plays</span>
+                            <span class="place-votes">
+                                <span class="upvote">↑${formatNumber(place.TotalUpVotes || 0)}</span>
+                                <span class="downvote">↓${formatNumber(place.TotalDownVotes || 0)}</span>
+                            </span>
+                        </div>
+                        <div class="place-players">${place.PlayerCount || 0} playing now</div>
+                        <a href="${place.GameDetailReferralUrl || `https://www.roblox.com/games/${place.PlaceID}/`}" class="place-play-btn" target="_blank">Play</a>
+                    </div>
+                `;
                 container.appendChild(div);
             });
-            modal.style.display='block';
+            document.getElementById('placesModal').style.display = 'block';
         }
-        function showFriendsModal(){ createFriendList(playerCard.dataset.friends,document.getElementById('friendsModal'),'friendsContent'); }
-        function showFollowersModal(){ createFriendList(playerCard.dataset.followers,document.getElementById('followersModal'),'followersContent'); }
-        function showFollowingModal(){ createFriendList(playerCard.dataset.following,document.getElementById('followingModal'),'followingContent'); }
-        function showGroupsModal(){
-            const groups=JSON.parse(playerCard.dataset.groups||'{}'); const container=document.getElementById('groupsContent'); container.innerHTML='';
-            if(!groups.data?.length) return container.innerHTML='<p>No groups.</p>';
-            const list=document.createElement('div'); list.className='friends-list';
-            groups.data.forEach(g=>{
-                const div=document.createElement('div'); div.className='friend-item';
-                div.innerHTML=`<img class="friend-avatar" src="https://www.roblox.com/Thumbs/Asset.ashx?width=150&height=150&assetId=${g.group.emblemUrl?.split('=')[1]||0}"><div class="friend-info"><div class="friend-name">${g.group.name}</div><div class="friend-username">${g.role.name}</div><div class="friend-id">ID: ${g.group.id}</div></div>`;
+
+        function createFriendList(data, modal, listEl) {
+            const list = JSON.parse(data || '{}');
+            const container = document.getElementById(listEl);
+            container.innerHTML = '';
+            if (!list.data?.length) return container.innerHTML = '<p>No data.</p>';
+            list.data.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'friend-item';
+                div.innerHTML = `
+                    <img class="friend-avatar" src="${getProxiedImageUrl(`https://www.roblox.com/headshot-thumbnail/image?userId=${u.id}&width=150&height=150&format=png`)}">
+                    <div class="friend-info">
+                        <div class="friend-name">${u.displayName || u.name}</div>
+                        <div class="friend-username">@${u.name}</div>
+                        <div class="friend-id">ID: ${u.id}</div>
+                    </div>
+                `;
+                div.onclick = () => {
+                    input.value = u.id;
+                    fetchPlayerData();
+                    modal.style.display = 'none';
+                };
+                container.appendChild(div);
+            });
+            modal.style.display = 'block';
+        }
+
+        function showFriendsModal() {
+            createFriendList(playerCard.dataset.friends, document.getElementById('friendsModal'), 'friendsContent');
+        }
+        function showFollowersModal() {
+            createFriendList(playerCard.dataset.followers, document.getElementById('followersModal'), 'followersContent');
+        }
+        function showFollowingModal() {
+            createFriendList(playerCard.dataset.following, document.getElementById('followingModal'), 'followingContent');
+        }
+        function showGroupsModal() {
+            const groups = JSON.parse(playerCard.dataset.groups || '{}');
+            const container = document.getElementById('groupsContent');
+            container.innerHTML = '';
+            if (!groups.data?.length) return container.innerHTML = '<p>No groups.</p>';
+            const list = document.createElement('div');
+            list.className = 'friends-list';
+            groups.data.forEach(g => {
+                const div = document.createElement('div');
+                div.className = 'friend-item';
+                div.innerHTML = `
+                    <img class="friend-avatar" src="${getProxiedImageUrl(`https://www.roblox.com/Thumbs/Asset.ashx?width=150&height=150&assetId=${g.group.emblemUrl?.split('=')[1] || 0}`)}">
+                    <div class="friend-info">
+                        <div class="friend-name">${g.group.name}</div>
+                        <div class="friend-username">${g.role.name}</div>
+                        <div class="friend-id">ID: ${g.group.id}</div>
+                    </div>
+                `;
                 list.appendChild(div);
             });
             container.appendChild(list);
-            document.getElementById('groupsModal').style.display='block';
+            document.getElementById('groupsModal').style.display = 'block';
         }
 
-        /* ---------- Initial load if query param exists ---------- */
-        if(input.value) fetchPlayerData();
+        if (input.value) fetchPlayerData();
     </script>
 </body>
 </html>
