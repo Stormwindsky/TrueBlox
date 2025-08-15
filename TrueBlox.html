@@ -95,23 +95,21 @@
         .downvote{color:var(--danger)}
         .place-play-btn{display:block;width:100%;padding:8px;background:var(--primary);color:#fff;text-align:center;border-radius:var(--border-radius);text-decoration:none;font-weight:600;transition:background .2s}
         .place-play-btn:hover{background:#0088cc}
-        .rolibadge-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;text-align:center}
-        .rolibadge-icon{width:50px;height:50px;margin:0 auto 10px;display:block;filter:hue-rotate(180deg) brightness(1.2)}
-        .rolibadge-name{font-size:.9rem;margin-top:5px}
-        .rolibadges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:15px;margin-top:20px}
-        .rolimons-stats{background:var(--bg);border:1px solid var(--border);border-radius:var(--border-radius);padding:15px;margin-top:20px}
-        .rolimons-stats h3{color:var(--primary);margin-bottom:10px}
-        .rolimons-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        .rolimons-stat{font-size:.9rem}
-        .rolimons-stat span:first-child{color:var(--muted)}
+        .profile-description{margin-top:20px;padding:15px;background:var(--bg);border-radius:var(--border-radius);border:1px solid var(--border)}
+        .profile-description h3{margin-bottom:10px;color:var(--primary)}
+        #avatar3dContainer{width:100%;height:400px;position:relative;margin-top:20px;border-radius:var(--border-radius);overflow:hidden;border:1px solid var(--border)}
+        #avatar3dViewer{width:100%;height:100%;background:var(--bg)}
+        .avatar3d-controls{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.5);padding:5px;border-radius:4px;z-index:100}
+        .avatar3d-controls button{background:#444;color:#fff;border:none;padding:5px 10px;margin:0 2px;border-radius:3px;cursor:pointer}
+        .avatar3d-controls button:hover{background:#666}
         @media(max-width:600px){
             .player-header{flex-direction:column;text-align:center}
             .player-avatar{margin-right:0;margin-bottom:15px}
             .stats-grid{grid-template-columns:1fr 1fr}
             .modal-content{width:95%;margin:10px auto}
             .places-grid{grid-template-columns:1fr}
-            .rolibadges-grid{grid-template-columns:1fr 1fr}
-            .rolimons-stats-grid{grid-template-columns:1fr}
+            .action-buttons{flex-wrap:wrap;justify-content:center}
+            .action-btn{width:100%;margin-bottom:5px}
         }
     </style>
 </head>
@@ -146,6 +144,22 @@
                 </div>
             </div>
 
+            <div class="profile-description" id="profileDescription">
+                <h3>About</h3>
+                <p id="descriptionText">No description available</p>
+            </div>
+
+            <div id="avatar3dContainer">
+                <div id="avatar3dViewer"></div>
+                <div class="avatar3d-controls" id="avatar3dControls" style="display:none">
+                    <button id="zoomInBtn">+</button>
+                    <button id="zoomOutBtn">-</button>
+                    <button id="rotateLeftBtn">↻</button>
+                    <button id="rotateRightBtn">↺</button>
+                    <button id="resetViewBtn">Reset</button>
+                </div>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-card"><h3>User ID</h3><p id="playerIdStat"></p></div>
                 <div class="stat-card"><h3>Account Created</h3><p id="playerCreated"></p></div>
@@ -156,22 +170,15 @@
                 <div class="stat-card" id="followingCountCard"><h3>Following</h3><p id="followingCount"></p></div>
                 <div class="stat-card" id="groupRolesCard"><h3>Group Roles</h3><p id="groupRolesCount"></p></div>
                 <div class="stat-card" id="placesCountCard"><h3>Places</h3><p id="placesCount"></p></div>
-            </div>
-
-            <div class="rolimons-stats" id="rolimonsStats" style="display:none;">
-                <h3>Rolimons Stats</h3>
-                <div class="rolimons-stats-grid" id="rolimonsStatsGrid"></div>
-            </div>
-
-            <div class="rolimons-stats" id="rolibadgesSection" style="display:none;">
-                <h3>Rolibadges</h3>
-                <div class="rolibadges-grid" id="rolibadgesGrid"></div>
+                <div class="stat-card" id="favoritesCountCard"><h3>Favorites</h3><p id="favoritesCount"></p></div>
             </div>
 
             <div class="action-buttons">
                 <button id="viewProfileBtn" class="action-btn view-profile-btn">View on Roblox</button>
                 <button id="showBadgesBtn" class="action-btn">Show Badges</button>
                 <button id="showPlacesBtn" class="action-btn">Show Places</button>
+                <button id="showFavoritesBtn" class="action-btn">Show Favorites</button>
+                <button id="rolimonsBtn" class="action-btn" style="background:#af00ff;color:#fff">Rolimons Badges</button>
             </div>
         </div>
 
@@ -222,6 +229,19 @@
             <div id="placesContent" class="places-grid"></div>
         </div>
     </div>
+    <div id="favoritesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">Favorite Games</h2>
+            <div id="favoritesContent" class="places-grid"></div>
+        </div>
+    </div>
+
+    <!-- Three.js libraries for 3D avatar viewer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.min.js"></script>
 
     <script>
         /* ---------- Theme handling ---------- */
@@ -248,7 +268,7 @@
             history.replaceState(null, '', url);
         }
 
-        /* ---------- Core logic ---------- */
+        /* ---------- Proxy helpers ---------- */
         const proxyUrl = 'https://corsproxy.io/?';
         const searchBtn = document.getElementById('searchBtn');
         const loading = document.getElementById('loading');
@@ -261,9 +281,6 @@
         }
         function formatNumber(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        }
-        function formatBadgeName(name) {
-            return name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
         async function resolveUsername(name) {
@@ -279,18 +296,151 @@
             return json.data[0].id;
         }
 
-        /* ======  OPTION 1 – Rolimons with silent failure  ====== */
-        async function fetchRolimonsData(userId) {
+        /* ---------- 3D Avatar Viewer ---------- */
+        let scene, camera, renderer, controls, avatarModel;
+        const avatarContainer = document.getElementById('avatar3dViewer');
+        const avatarControls = document.getElementById('avatar3dControls');
+
+        function init3DViewer() {
+            // Clear previous scene if exists
+            while (avatarContainer.firstChild) {
+                avatarContainer.removeChild(avatarContainer.firstChild);
+            }
+
+            // Set up Three.js scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+
+            camera = new THREE.PerspectiveCamera(75, avatarContainer.clientWidth / avatarContainer.clientHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(avatarContainer.clientWidth, avatarContainer.clientHeight);
+            avatarContainer.appendChild(renderer.domElement);
+
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+
+            // Add orbit controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            controls.screenSpacePanning = false;
+            controls.maxPolarAngle = Math.PI;
+            controls.minPolarAngle = 0;
+            controls.enableZoom = true;
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = avatarContainer.clientWidth / avatarContainer.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(avatarContainer.clientWidth, avatarContainer.clientHeight);
+            });
+        }
+
+        function getCdnUrl(hash) {
+            for (var i = 31, t = 0; t < 38; t++)
+                i ^= hash[t].charCodeAt(0);
+            return `https://t${(i % 8).toString()}.rbxcdn.com/${hash}`;
+        }
+
+        async function load3DAvatar(userId) {
             try {
-                const url = `${proxyUrl}${encodeURIComponent(
-                    `https://api.rolimons.com/players/v1/playerinfo/${userId}`
-                )}`;
-                const res = await fetch(url);
-                if (!res.ok) return null;
-                const data = await res.json();
-                return data.success ? data : null;
-            } catch {
-                return null; // silently ignore any error
+                // First get the avatar 3D data
+                const avatar3dUrl = `${proxyUrl}${encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-3d?userId=${userId}`)}`;
+                const avatarRes = await fetch(avatar3dUrl);
+                const avatarData = await avatarRes.json();
+
+                if (avatarData.state !== 'Completed' || !avatarData.imageUrl) {
+                    throw new Error('3D avatar not available');
+                }
+
+                // Get the 3D model data
+                const modelDataUrl = avatarData.imageUrl;
+                const modelRes = await fetch(`${proxyUrl}${encodeURIComponent(modelDataUrl)}`);
+                const modelData = await modelRes.json();
+
+                // Load the MTL file
+                const mtlLoader = new THREE.MTLLoader();
+                mtlLoader.setPath('');
+                const mtlUrl = getCdnUrl(modelData.mtl);
+                const materials = await new Promise((resolve, reject) => {
+                    mtlLoader.load(`${proxyUrl}${encodeURIComponent(mtlUrl)}`, resolve, undefined, reject);
+                });
+
+                // Disable transparency for all materials
+                for (const key in materials.materials) {
+                    materials.materials[key].transparent = false;
+                }
+
+                // Load the OBJ file with materials
+                const objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.setPath('');
+
+                // Modify URLs to use correct CDN
+                objLoader.setResourcePath('');
+                objLoader.setURLModifier(url => {
+                    const hash = url.split('com/')[1];
+                    return getCdnUrl(hash);
+                });
+
+                const objUrl = getCdnUrl(modelData.obj);
+                avatarModel = await new Promise((resolve, reject) => {
+                    objLoader.load(`${proxyUrl}${encodeURIComponent(objUrl)}`, resolve, undefined, reject);
+                });
+
+                // Add model to scene
+                scene.add(avatarModel);
+
+                // Center the model
+                const box = new THREE.Box3().setFromObject(avatarModel);
+                const center = box.getCenter(new THREE.Vector3());
+                avatarModel.position.sub(center);
+
+                // Show controls
+                avatarControls.style.display = 'block';
+
+                // Set up control buttons
+                document.getElementById('zoomInBtn').onclick = () => {
+                    camera.fov -= 5;
+                    camera.updateProjectionMatrix();
+                };
+                document.getElementById('zoomOutBtn').onclick = () => {
+                    camera.fov += 5;
+                    camera.updateProjectionMatrix();
+                };
+                document.getElementById('rotateLeftBtn').onclick = () => {
+                    avatarModel.rotation.y += 0.1;
+                };
+                document.getElementById('rotateRightBtn').onclick = () => {
+                    avatarModel.rotation.y -= 0.1;
+                };
+                document.getElementById('resetViewBtn').onclick = () => {
+                    camera.position.set(0, 0, 5);
+                    camera.lookAt(0, 0, 0);
+                    camera.fov = 75;
+                    camera.updateProjectionMatrix();
+                    avatarModel.rotation.set(0, 0, 0);
+                };
+
+            } catch (err) {
+                console.error('Failed to load 3D avatar:', err);
+                avatarContainer.innerHTML = '<p style="text-align:center;padding:20px;color:var(--muted)">3D avatar not available</p>';
+                avatarControls.style.display = 'none';
             }
         }
 
@@ -305,6 +455,9 @@
                 const id = await resolveUsername(raw);
                 updateUrl(raw);
 
+                // Initialize 3D viewer
+                init3DViewer();
+
                 const urls = [
                     `${proxyUrl}${encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=150x150&format=Png&isCircular=false`)}`,
                     `${proxyUrl}${encodeURIComponent(`https://users.roblox.com/v1/users/${id}`)}`,
@@ -316,32 +469,33 @@
                     `${proxyUrl}${encodeURIComponent(`https://friends.roblox.com/v1/users/${id}/friends`)}`,
                     `${proxyUrl}${encodeURIComponent(`https://friends.roblox.com/v1/users/${id}/followers`)}`,
                     `${proxyUrl}${encodeURIComponent(`https://friends.roblox.com/v1/users/${id}/followings`)}`,
-                    `${proxyUrl}${encodeURIComponent(`https://www.roblox.com/users/profile/playergames-json?userId=${id}`)}`
+                    `${proxyUrl}${encodeURIComponent(`https://www.roblox.com/users/profile/playergames-json?userId=${id}`)}`,
+                    `${proxyUrl}${encodeURIComponent(`https://games.roblox.com/v2/users/${id}/favorite/games`)}`
                 ];
 
                 const [
                     avatarRes, userRes, fcRes, focRes, ficRes, groupsRes, badgesRes,
-                    friendsListRes, followersListRes, followingListRes, placesRes
+                    friendsListRes, followersListRes, followingListRes, placesRes, favoritesRes
                 ] = await Promise.all(urls.map(u => fetch(u)));
 
                 const [
                     avatarData, userData, fc, foc, fic, groupsData, badgesData,
-                    friendsList, followersList, followingList, placesData
+                    friendsList, followersList, followingList, placesData, favoritesData
                 ] = await Promise.all([
                     avatarRes.json(), userRes.json(), fcRes.json(), focRes.json(), ficRes.json(),
                     groupsRes.json(), badgesRes.json(), friendsListRes.json(), followersListRes.json(),
-                    followingListRes.json(), placesRes.json()
+                    followingListRes.json(), placesRes.json(), favoritesRes.json()
                 ]);
 
                 if (userData.errors) throw new Error(userData.errors[0]?.message || 'User not found');
 
-                const rolimonsData = await fetchRolimonsData(id);
-
                 displayPlayerData(
                     avatarData, userData, fc, foc, fic, groupsData, badgesData,
-                    friendsList, followersList, followingList, placesData,
-                    rolimonsData
+                    friendsList, followersList, followingList, placesData, favoritesData
                 );
+
+                // Load 3D avatar after displaying basic info
+                load3DAvatar(id);
             } catch (err) {
                 showError(err.message || 'Failed to fetch player data');
             } finally {
@@ -349,22 +503,23 @@
             }
         }
 
-        function displayPlayerData(a, u, fc, foc, fic, g, b, fl, fol, fil, p, rolimons) {
+        function displayPlayerData(a, u, fc, foc, fic, g, b, fl, fol, fil, p, fav) {
             if (a.data?.[0]?.imageUrl) {
                 document.getElementById('playerAvatar').src = getProxiedImageUrl(a.data[0].imageUrl);
             }
             const displayNameEl = document.getElementById('playerDisplayName');
             displayNameEl.textContent = u.displayName || u.name;
-            if (rolimons?.premium) {
-                const premiumSpan = document.createElement('span');
-                premiumSpan.className = 'premium';
-                premiumSpan.textContent = '💎';
-                premiumSpan.title = 'Premium Member';
-                displayNameEl.appendChild(premiumSpan);
-            }
             document.getElementById('playerUsername').textContent = `@${u.name}`;
             document.getElementById('playerIdStat').textContent = u.id;
             document.getElementById('playerCreated').textContent = new Date(u.created).toLocaleDateString();
+
+            // Display profile description
+            const descriptionText = document.getElementById('descriptionText');
+            if (u.description && u.description.trim() !== '') {
+                descriptionText.textContent = u.description;
+            } else {
+                descriptionText.textContent = 'No description available';
+            }
 
             const badgesBox = document.getElementById('badges');
             badgesBox.innerHTML = '';
@@ -396,6 +551,7 @@
             document.getElementById('followingCount').textContent = fic.count || 0;
             document.getElementById('groupRolesCount').textContent = g.data?.length || 0;
             document.getElementById('placesCount').textContent = p.Games?.length || 0;
+            document.getElementById('favoritesCount').textContent = fav.data?.length || 0;
 
             playerCard.dataset.badges = JSON.stringify(b);
             playerCard.dataset.friends = JSON.stringify(fl);
@@ -403,89 +559,12 @@
             playerCard.dataset.following = JSON.stringify(fil);
             playerCard.dataset.groups = JSON.stringify(g);
             playerCard.dataset.places = JSON.stringify(p);
+            playerCard.dataset.favorites = JSON.stringify(fav);
             playerCard.style.display = 'block';
 
-            displayRolimonsData(rolimons);
-        }
-
-        function displayRolimonsData(data) {
-            const statsSection = document.getElementById('rolimonsStats');
-            const badgesSection = document.getElementById('rolibadgesSection');
-            const statsGrid = document.getElementById('rolimonsStatsGrid');
-            const badgesGrid = document.getElementById('rolibadgesGrid');
-
-            statsGrid.innerHTML = '';
-            badgesGrid.innerHTML = '';
-
-            if (!data || !data.success) {
-                statsSection.style.display = 'none';
-                badgesSection.style.display = 'none';
-                return;
-            }
-            statsSection.style.display = 'block';
-            const statsToShow = [
-                { name: 'Rank', value: data.rank || 'N/A' },
-                { name: 'RAP', value: formatNumber(data.rap) || '0' },
-                { name: 'Value', value: formatNumber(data.value) || '0' },
-                { name: 'Last Online', value: data.last_online ? new Date(data.last_online * 1000).toLocaleString() : 'Unknown' },
-                { name: 'Last Location', value: data.last_location || 'Unknown' },
-                { name: 'Privacy', value: data.privacy_enabled ? 'Enabled' : 'Disabled' }
-            ];
-            statsToShow.forEach(stat => {
-                const statEl = document.createElement('div');
-                statEl.className = 'rolimons-stat';
-                statEl.innerHTML = `<span>${stat.name}:</span> <span>${stat.value}</span>`;
-                statsGrid.appendChild(statEl);
-            });
-
-            if (data.rolibadges) {
-                badgesSection.style.display = 'block';
-                const badgeNames = {
-                    value_1m: 'Value Over 1M',
-                    value_5m: 'Value Over 5M',
-                    own_1_stf: 'Owns STF Item',
-                    value_10m: 'Value Over 10M',
-                    value_20m: 'Value Over 20M',
-                    own_1_rare: 'Owns Rare Item',
-                    own_5_noob: 'Owns 5 Noob Items',
-                    value_100k: 'Value Over 100K',
-                    value_500k: 'Value Over 500K',
-                    own_15_noob: 'Owns 15 Noob Items',
-                    own_3_rares: 'Owns 3 Rare Items',
-                    own_10_items: 'Owns 10 Items',
-                    own_10_rares: 'Owns 10 Rare Items',
-                    own_100_items: 'Owns 100 Items',
-                    own_1_dominus: 'Owns Dominus',
-                    own_1000_items: 'Owns 1000 Items',
-                    own_1_kotn_item: 'Owns KotN Item',
-                    own_1_big_dominus: 'Owns Big Dominus',
-                    own_all_asset_types: 'Owns All Asset Types',
-                    own_epic_katana_set: 'Owns Epic Katana Set',
-                    own_10_pct_of_1_item: 'Owns 10% of 1 Item',
-                    own_1_immortal_sword: 'Owns Immortal Sword',
-                    own_25_pct_of_1_item: 'Owns 25% of 1 Item',
-                    own_50_pct_of_1_item: 'Owns 50% of 1 Item',
-                    own_1_valued_federation_item: 'Owns Valued Federation Item'
-                };
-                Object.entries(data.rolibadges).forEach(([key, timestamp]) => {
-                    if (timestamp) {
-                        const badgeEl = document.createElement('div');
-                        badgeEl.className = 'rolibadge-item';
-                        const badgeName = badgeNames[key] || formatBadgeName(key);
-                        const badgeIcon = `https://www.rolimons.com/images/badges/${key}.svg`;
-                        badgeEl.innerHTML = `
-                            <img class="rolibadge-icon" src="${badgeIcon}" alt="${badgeName}" title="${badgeName}">
-                            <div class="rolibadge-name">${badgeName}</div>
-                        `;
-                        badgesGrid.appendChild(badgeEl);
-                    }
-                });
-                if (badgesGrid.children.length === 0) {
-                    badgesGrid.innerHTML = '<p>No Rolibadges found.</p>';
-                }
-            } else {
-                badgesSection.style.display = 'none';
-            }
+            /* Rolimons button link */
+            document.getElementById('rolimonsBtn').onclick = () =>
+                window.open(`https://www.rolimons.com/playerrolibadges/${u.id}`, '_blank');
         }
 
         function showError(msg) {
@@ -499,11 +578,13 @@
         });
         document.getElementById('showBadgesBtn').addEventListener('click', showBadgesModal);
         document.getElementById('showPlacesBtn').addEventListener('click', showPlacesModal);
+        document.getElementById('showFavoritesBtn').addEventListener('click', showFavoritesModal);
         document.getElementById('friendsCountCard').addEventListener('click', showFriendsModal);
         document.getElementById('followersCountCard').addEventListener('click', showFollowersModal);
         document.getElementById('followingCountCard').addEventListener('click', showFollowingModal);
         document.getElementById('groupRolesCard').addEventListener('click', showGroupsModal);
         document.getElementById('placesCountCard').addEventListener('click', showPlacesModal);
+        document.getElementById('favoritesCountCard').addEventListener('click', showFavoritesModal);
 
         [...document.querySelectorAll('.close')].forEach(btn => {
             btn.addEventListener('click', () => {
@@ -562,6 +643,34 @@
                 container.appendChild(div);
             });
             document.getElementById('placesModal').style.display = 'block';
+        }
+
+        function showFavoritesModal() {
+            const favorites = JSON.parse(playerCard.dataset.favorites || '{}');
+            const container = document.getElementById('favoritesContent');
+            container.innerHTML = '';
+            if (!favorites.data?.length) return container.innerHTML = '<p>This player has no favorite games.</p>';
+            favorites.data.forEach(game => {
+                const div = document.createElement('div');
+                div.className = 'place-item';
+                div.innerHTML = `
+                    <img class="place-thumbnail" src="${getProxiedImageUrl(game.thumbnails?.gameIconUrl || `https://www.roblox.com/asset-thumbnail/image?assetId=${game.id}&width=300&height=300&format=png`)}">
+                    <div class="place-info">
+                        <div class="place-name" title="${game.name}">${game.name}</div>
+                        <div class="place-stats">
+                            <span class="place-players">${formatNumber(game.playing || 0)} playing</span>
+                            <span class="place-votes">
+                                <span class="upvote">↑${formatNumber(game.upVotes || 0)}</span>
+                                <span class="downvote">↓${formatNumber(game.downVotes || 0)}</span>
+                            </span>
+                        </div>
+                        <div class="place-players">Created by: ${game.creatorName || 'Unknown'}</div>
+                        <a href="https://www.roblox.com/games/${game.id}/" class="place-play-btn" target="_blank">Play</a>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            document.getElementById('favoritesModal').style.display = 'block';
         }
 
         function createFriendList(data, modal, listEl) {
